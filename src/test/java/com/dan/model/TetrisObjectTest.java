@@ -19,10 +19,10 @@ public class TetrisObjectTest {
 
         // Then
         assertThat(coordinates).isEqualTo(List.of(
-                new Coordinate(1, 0),
-                new Coordinate(2, 0),
-                new Coordinate(2, 1),
-                new Coordinate(2, 2)
+                new Coordinate(1, 0, TileState.NORMAL),
+                new Coordinate(2, 0, TileState.NORMAL),
+                new Coordinate(2, 1, TileState.NORMAL),
+                new Coordinate(2, 2, TileState.NORMAL)
         ));
     }
 
@@ -42,8 +42,8 @@ public class TetrisObjectTest {
 
         // Then
         assertThat(coordinates).isEqualTo(List.of(
-                new Coordinate(4, 4),
-                new Coordinate(5, 5)
+                new Coordinate(4, 4, TileState.NORMAL),
+                new Coordinate(5, 5, TileState.NORMAL)
         ));
     }
 

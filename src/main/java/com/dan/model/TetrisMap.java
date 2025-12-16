@@ -109,7 +109,7 @@ public class TetrisMap {
             boolean[] row = tiles[x];
             for (int y = 0; y < row.length; y++) {
                 if (row[y]) {
-                    coordinates.add(new Coordinate(x, y));
+                    coordinates.add(new Coordinate(x, y, TileState.NORMAL));
                 }
             }
         }
