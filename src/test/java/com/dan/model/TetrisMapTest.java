@@ -6,7 +6,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class TetrisMapTest {
 
-    private final TetrisMap map = new TetrisMap(10, 15);
+    private final TetrisMap map = new TetrisMap(10, 15, null, 4e8);
 
     @Test
     void getNewObject() {

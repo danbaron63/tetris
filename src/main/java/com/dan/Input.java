@@ -23,7 +23,7 @@ public class Input {
         return keys.contains(keyCode);
     }
 
-    Set<KeyCode> getPressedKeys() {
+    public Set<KeyCode> getPressedKeys() {
         Set<KeyCode> keys = pressedKeys;
         pressedKeys = new HashSet<>();
         return keys;

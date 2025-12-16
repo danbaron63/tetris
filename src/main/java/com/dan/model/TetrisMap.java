@@ -1,5 +1,6 @@
 package com.dan.model;
 
+import com.dan.Input;
 import javafx.scene.input.KeyCode;
 
 import java.util.ArrayList;
@@ -14,10 +15,15 @@ public class TetrisMap {
     private TetrisObject fallingObject;
     private boolean objectAtBottom = true;
     private final boolean[][] tiles;
+    private final double updateFrequencyNanos;
+    private double lastUpdate = 0;
+    private final Input input;
 
-    public TetrisMap(int columns, int rows) {
+    public TetrisMap(int columns, int rows, Input input, double updateFrequencyNanos) {
         this.columns = columns;
         this.rows = rows;
+        this.input = input;
+        this.updateFrequencyNanos = updateFrequencyNanos;
         this.tiles = new boolean[columns][rows];
         for (int x = 0; x < columns; x++) {
             for (int y = 0; y < rows; y++) {
@@ -26,7 +32,14 @@ public class TetrisMap {
         }
     }
 
-    public void update(Set<KeyCode> pressedKeys) {
+    public void update(double ts) {
+        if (ts > lastUpdate + updateFrequencyNanos) {
+            lastUpdate = ts;
+            update(input.getPressedKeys());
+        }
+    }
+
+    private void update(Set<KeyCode> pressedKeys) {
         if (newObjectRequired()) {
             fallingObject = getNewObject();
             // Check if object can be placed as the grid may be full.

@@ -20,53 +20,39 @@ public class Main extends Application {
         int w = 800;
         int h = 600;
         Canvas canvas = new Canvas(w, h);
-        map = new TetrisMap(10, 15);
-        view = new TetrisView(canvas, map);
 
         Scene scene = new Scene(new StackPane(canvas));
         input = new Input(scene);
+        map = new TetrisMap(10, 15, input, 4e8);
+        view = new TetrisView(canvas, map);
         stage.setScene(scene);
         stage.setTitle("JavaFX 2D Game");
         stage.show();
 
         new AnimationTimer() {
             final long updateFpsEvery = 500;
-            final long frameEvery = (long) 4e8;
-            long nextThreshold = 0;
             long fpsLast = 0;
             long frames = 0;
-            long last = 0;
             String info = "";
 
             @Override
             public void handle(long now) {
-                if (last == 0) {
-                    last = now;
-                    return;
-                }
 
-                double delta = now - last;
-                double dt = delta / 1e9;
-                last = now;
-//                if (frames % updateFpsEvery == 0) {
-//                    double fps = updateFpsEvery / ((now - fpsLast) / 1e9);
-//                    info = String.format("FPS: %s, X: %s, Y: %s", (int) fps, (int) player.getXLoc(), (int) player.getYLoc());
-//                    fpsLast = now;
-//                }
-
-                if (now > nextThreshold) {
-                    System.out.printf("Frame %s; now: %s; nextThreshold %s %n", frames, now, nextThreshold);
-                    update(dt);
-                    render(info);
-                    frames += 1;
-                    nextThreshold = now + frameEvery;
+                if (frames % updateFpsEvery == 0) {
+                    double fps = updateFpsEvery / ((now - fpsLast) / 1e9);
+                    info = String.format("FPS: %s", (int) fps);
+                    fpsLast = now;
                 }
+                update(now);
+                render(info);
+
+                frames += 1;
             }
         }.start();
     }
 
     void update(double dt) {
-        map.update(input.getPressedKeys());
+        map.update(dt);
     }
 
     void render(String info) {
