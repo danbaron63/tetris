@@ -46,6 +46,7 @@ public class TetrisMap {
                 objectAtBottom = true;
             }
         }
+        clearRows(tiles, getColumns(), getRows());
     }
 
     private boolean canObjectMove() {
@@ -101,5 +102,36 @@ public class TetrisMap {
         }
         coordinates.addAll(fallingObject.getCoordinates());
         return coordinates;
+    }
+
+    public static void clearRows(boolean[][] tiles, int columns, int rows) {
+        for (int y = 0; y < rows; y++) {
+            boolean result = true;
+            for (int x = 0; x < columns; x++) {
+                result = result && tiles[x][y];
+            }
+            if (result) {
+                // shift all values down 1
+                System.out.printf("Row %s needs removing%n", y);
+                removeRow(y, tiles, columns);
+            }
+        }
+    }
+
+    private static void removeRow(int rowToRemove,
+                                  boolean[][] tiles,
+                                  int columns) {
+
+        // Shift everything above the removed row down
+        for (int y = rowToRemove; y > 0; y--) {
+            for (int x = 0; x < columns; x++) {
+                tiles[x][y] = tiles[x][y - 1];
+            }
+        }
+
+        // Clear the top row
+        for (int x = 0; x < columns; x++) {
+            tiles[x][0] = false;
+        }
     }
 }

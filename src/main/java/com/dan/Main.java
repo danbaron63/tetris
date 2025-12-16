@@ -20,7 +20,7 @@ public class Main extends Application {
         int w = 800;
         int h = 600;
         Canvas canvas = new Canvas(w, h);
-        map = new TetrisMap(10, 10);
+        map = new TetrisMap(10, 15);
         view = new TetrisView(canvas, map);
 
         Scene scene = new Scene(new StackPane(canvas));

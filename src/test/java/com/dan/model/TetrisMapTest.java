@@ -35,4 +35,25 @@ public class TetrisMapTest {
         // Then
         assertThat(cols).isEqualTo(10);
     }
+
+    @Test
+    void clearRows() {
+        // Given
+        boolean[][] inputRows = new boolean[][] {
+                {true, true,  true },
+                {false, false, true },
+                {false, false, true }
+        };
+        boolean[][] expectedOutput = new boolean[][] {
+                {false, true, true },
+                {false, false, false},
+                {false, false, false}
+        };
+
+        // When
+        TetrisMap.clearRows(inputRows, 3, 3);
+
+        // Then
+        assertThat(inputRows).isDeepEqualTo(expectedOutput);
+    }
 }
