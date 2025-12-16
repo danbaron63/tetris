@@ -9,6 +9,11 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class TetrisMap {
+    /**
+     * Tetris map implemented by a 2d boolean array representing tiles.
+     * Array should be organised in rows, e.g. tiles[row#][col#].
+     * This allows easy iterating over rows rather than columns.
+     */
 
     private final int columns;
     private final int rows;
@@ -24,10 +29,10 @@ public class TetrisMap {
         this.rows = rows;
         this.input = input;
         this.updateFrequencyNanos = updateFrequencyNanos;
-        this.tiles = new boolean[columns][rows];
+        this.tiles = new boolean[rows][columns];
         for (int x = 0; x < columns; x++) {
             for (int y = 0; y < rows; y++) {
-                tiles[x][y] = false;
+                tiles[y][x] = false;
             }
         }
     }
@@ -54,7 +59,7 @@ public class TetrisMap {
                 }
             } else {
                 for (Coordinate coordinate : fallingObject.getCoordinates()) {
-                    tiles[coordinate.x()][coordinate.y()] = true;
+                    tiles[coordinate.y()][coordinate.x()] = true;
                 }
                 objectAtBottom = true;
             }
@@ -68,7 +73,7 @@ public class TetrisMap {
             System.out.printf("Coordinate: x = %s, y = %s%n", coordinate.x(), coordinate.y());
 
             // if tile occupied or below bottom.
-            if (!(coordinate.y() < rows) || tiles[coordinate.x()][coordinate.y()]) {
+            if (!(coordinate.y() < rows) || tiles[coordinate.y()][coordinate.x()]) {
                 return false;
             }
         }
@@ -105,10 +110,10 @@ public class TetrisMap {
 
     public List<Coordinate> getAllTileCoordinates() {
         ArrayList<Coordinate> coordinates = new ArrayList<>(3);
-        for (int x = 0; x < tiles.length; x++) {
-            boolean[] row = tiles[x];
-            for (int y = 0; y < row.length; y++) {
-                if (row[y]) {
+        for (int y = 0; y < tiles.length; y++) {
+            boolean[] row = tiles[y];
+            for (int x = 0; x < row.length; x++) {
+                if (row[x]) {
                     coordinates.add(new Coordinate(x, y, TileState.NORMAL));
                 }
             }
@@ -121,7 +126,7 @@ public class TetrisMap {
         for (int y = 0; y < rows; y++) {
             boolean result = true;
             for (int x = 0; x < columns; x++) {
-                result = result && tiles[x][y];
+                result = result && tiles[y][x];
             }
             if (result) {
                 // shift all values down 1
@@ -138,13 +143,13 @@ public class TetrisMap {
         // Shift everything above the removed row down
         for (int y = rowToRemove; y > 0; y--) {
             for (int x = 0; x < columns; x++) {
-                tiles[x][y] = tiles[x][y - 1];
+                tiles[y][x] = tiles[y - 1][x];
             }
         }
 
         // Clear the top row
         for (int x = 0; x < columns; x++) {
-            tiles[x][0] = false;
+            tiles[0][x] = false;
         }
     }
 }
