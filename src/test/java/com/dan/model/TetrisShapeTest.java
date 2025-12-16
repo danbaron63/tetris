@@ -1,4 +1,4 @@
-package com.dan;
+package com.dan.model;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;

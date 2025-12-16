@@ -1,4 +1,4 @@
-package com.dan;
+package com.dan.model;
 
 public enum TetrisShape {
     SQUARE(new boolean[][]{

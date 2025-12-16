@@ -1,4 +1,4 @@
-package com.dan;
+package com.dan.model;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,15 +23,22 @@ public class TetrisObject {
         return yLoc;
     }
 
-    void moveLeft() {
-        moveX(-1);
+    public void moveLeft(int columns) {
+        moveX(-1, columns);
     }
 
-    void moveRight() {
-        moveX(1);
+    public
+    void moveRight(int columns) {
+        moveX(1, columns);
     }
 
-    void moveX(int amount) {
+    void moveX(int amount, int columns) {
+        final List<Coordinate> coordinates = getCoordinates(tiles, amount, 0, getXLoc(), getYLoc());
+        for (Coordinate coordinate : coordinates) {
+            if (coordinate.x() < 0 || coordinate.x() >= columns) {
+                return;
+            }
+        }
         this.xLoc += amount;
     }
 
@@ -39,25 +46,24 @@ public class TetrisObject {
         this.yLoc += 1;
     }
 
-    static List<Coordinate> getCoordinates(boolean[][] tiles, int yOffset, int xLoc, int yLoc) {
+    static List<Coordinate> getCoordinates(boolean[][] tiles, int xOffset, int yOffset, int xLoc, int yLoc) {
         ArrayList<Coordinate> coordinates = new ArrayList<>(3);
         for (int x = 0; x < tiles.length; x++) {
             boolean[] row = tiles[x];
             for (int y = 0; y < row.length; y++) {
                 if (row[y]) {
-                    coordinates.add(new Coordinate(xLoc + x, yLoc + y + yOffset));
+                    coordinates.add(new Coordinate(xLoc + x + xOffset, yLoc + y + yOffset));
                 }
             }
         }
         return coordinates;
-
     }
 
     List<Coordinate> getCoordinatesOfNextFall() {
-        return getCoordinates(tiles, 1, getXLoc(), getYLoc());
+        return getCoordinates(tiles, 0, 1, getXLoc(), getYLoc());
     }
 
     List<Coordinate> getCoordinates() {
-        return getCoordinates(tiles, 0, getXLoc(), getYLoc());
+        return getCoordinates(tiles, 0, 0, getXLoc(), getYLoc());
     }
 }

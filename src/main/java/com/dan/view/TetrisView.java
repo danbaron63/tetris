@@ -1,5 +1,7 @@
-package com.dan;
+package com.dan.view;
 
+import com.dan.model.Coordinate;
+import com.dan.model.TetrisMap;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
@@ -27,13 +29,23 @@ public class TetrisView {
         gc.setFill(Color.BLACK);
         gc.fillRect(0, 0, w,  h);
 
-        // Player
+        // Tiles
         for (Coordinate coordinate : map.getAllTileCoordinates()) {
             gc.setFill(Color.YELLOW);
             gc.fillRect(
-                    coordinate.x() * tileHeight, coordinate.y() * tileWidth,
-                    tileHeight, tileWidth
+                    coordinate.x() * tileWidth, coordinate.y() * tileHeight,
+                    tileWidth, tileHeight
             );
+        }
+
+        // Draw grid
+        for (int r = 0; r < map.getRows(); r++) {
+            gc.setStroke(Color.WHITE);
+            gc.strokeLine(0, r * tileHeight, w, r * tileHeight);
+        }
+        for (int c = 0; c < map.getColumns(); c++) {
+            gc.setStroke(Color.WHITE);
+            gc.strokeLine(c * tileWidth, 0, c * tileWidth, h);
         }
 
         // Fps

@@ -1,7 +1,10 @@
-package com.dan;
+package com.dan.model;
+
+import javafx.scene.input.KeyCode;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class TetrisMap {
@@ -23,13 +26,19 @@ public class TetrisMap {
         }
     }
 
-    void update() {
+    public void update(Set<KeyCode> pressedKeys) {
         if (newObjectRequired()) {
             fallingObject = getNewObject();
-            System.out.printf("X = %s, Y = %s%n", fallingObject.getXLoc(), fallingObject.getYLoc());
+            // Check if object can be placed as the grid may be full.
         } else {
             if (canObjectMove()) {
                 fallingObject.fallOne();
+                if (pressedKeys.contains(KeyCode.A)) {
+                    fallingObject.moveLeft(columns);
+                }
+                if (pressedKeys.contains(KeyCode.D)) {
+                    fallingObject.moveRight(columns);
+                }
             } else {
                 for (Coordinate coordinate : fallingObject.getCoordinates()) {
                     tiles[coordinate.x()][coordinate.y()] = true;
@@ -45,7 +54,7 @@ public class TetrisMap {
             System.out.printf("Coordinate: x = %s, y = %s%n", coordinate.x(), coordinate.y());
 
             // if tile occupied or below bottom.
-            if (coordinate.y() >= rows - 1 || tiles[coordinate.x()][coordinate.y()]) {
+            if (!(coordinate.y() < rows) || tiles[coordinate.x()][coordinate.y()]) {
                 return false;
             }
         }
@@ -60,27 +69,27 @@ public class TetrisMap {
         return false;
     }
 
-    TetrisObject getNewObject() {
+    public TetrisObject getNewObject() {
         final TetrisShape shape = switch (ThreadLocalRandom.current().nextInt(1, 4)) {
             case 1 -> TetrisShape.SQUARE;
             case 2 -> TetrisShape.L_SHAPE;
             case 3 -> TetrisShape.LONG;
             default -> throw new RuntimeException("Random number out of range");
         };
-        final int column = ThreadLocalRandom.current().nextInt(0, columns);
+        final int column = ThreadLocalRandom.current().nextInt(0, columns - shape.getSize());
         final int rotate = ThreadLocalRandom.current().nextInt();
         return new TetrisObject(column, shape, rotate);
     }
 
-    int getRows() {
+    public int getRows() {
         return rows;
     }
 
-    int getColumns() {
+    public int getColumns() {
         return columns;
     }
 
-    List<Coordinate> getAllTileCoordinates() {
+    public List<Coordinate> getAllTileCoordinates() {
         ArrayList<Coordinate> coordinates = new ArrayList<>(3);
         for (int x = 0; x < tiles.length; x++) {
             boolean[] row = tiles[x];

@@ -1,4 +1,4 @@
-package com.dan;
+package com.dan.model;
 
 import org.junit.jupiter.api.Test;
 
@@ -38,7 +38,7 @@ public class TetrisObjectTest {
         int yLoc = 3;
 
         // When
-        List<Coordinate> coordinates = TetrisObject.getCoordinates(tiles, yOffset, xLoc, yLoc);
+        List<Coordinate> coordinates = TetrisObject.getCoordinates(tiles, 0, yOffset, xLoc, yLoc);
 
         // Then
         assertThat(coordinates).isEqualTo(List.of(
@@ -66,7 +66,7 @@ public class TetrisObjectTest {
         TetrisObject object = new TetrisObject(5, TetrisShape.L_SHAPE, 0);
 
         // When
-        object.moveLeft();
+        object.moveLeft(10);
 
         // Then
         assertThat(object.getXLoc()).isEqualTo(4);
@@ -79,7 +79,7 @@ public class TetrisObjectTest {
         TetrisObject object = new TetrisObject(5, TetrisShape.L_SHAPE, 0);
 
         // When
-        object.moveRight();
+        object.moveRight(10);
 
         // Then
         assertThat(object.getXLoc()).isEqualTo(6);
