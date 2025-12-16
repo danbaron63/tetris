@@ -43,20 +43,12 @@ public class Main extends Application {
                     info = String.format("FPS: %s", (int) fps);
                     fpsLast = now;
                 }
-                update(now);
-                render(info);
+                map.update(now);
+                view.render(info);
 
                 frames += 1;
             }
         }.start();
-    }
-
-    void update(double dt) {
-        map.update(dt);
-    }
-
-    void render(String info) {
-        view.render(info);
     }
 
     public static void main(String[] args) {

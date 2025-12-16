@@ -52,7 +52,7 @@ public class TetrisObject {
             boolean[] row = tiles[x];
             for (int y = 0; y < row.length; y++) {
                 if (row[y]) {
-                    coordinates.add(new Coordinate(xLoc + x + xOffset, yLoc + y + yOffset, TileState.NORMAL));
+                    coordinates.add(new Coordinate(xLoc + x + xOffset, yLoc + y + yOffset, TileState.FALLING));
                 }
             }
         }

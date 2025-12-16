@@ -109,12 +109,21 @@ public class TetrisMap {
     }
 
     public List<Coordinate> getAllTileCoordinates() {
+        return getAllTileCoordinates(tiles, fallingObject);
+    }
+
+    public static List<Coordinate> getAllTileCoordinates(boolean[][] tiles, TetrisObject fallingObject) {
         ArrayList<Coordinate> coordinates = new ArrayList<>(3);
         for (int y = 0; y < tiles.length; y++) {
             boolean[] row = tiles[y];
+            boolean fullRow = isFullRow(row);
             for (int x = 0; x < row.length; x++) {
                 if (row[x]) {
-                    coordinates.add(new Coordinate(x, y, TileState.NORMAL));
+                    if (fullRow) {
+                        coordinates.add(new Coordinate(x, y, TileState.BREAKING));
+                    } else {
+                        coordinates.add(new Coordinate(x, y, TileState.NORMAL));
+                    }
                 }
             }
         }
@@ -124,11 +133,7 @@ public class TetrisMap {
 
     public static void clearRows(boolean[][] tiles, int columns, int rows) {
         for (int y = 0; y < rows; y++) {
-            boolean result = true;
-            for (int x = 0; x < columns; x++) {
-                result = result && tiles[y][x];
-            }
-            if (result) {
+            if (isFullRow(tiles[y])) {
                 // shift all values down 1
                 System.out.printf("Row %s needs removing%n", y);
                 removeRow(y, tiles, columns);
@@ -136,17 +141,21 @@ public class TetrisMap {
         }
     }
 
+    private static boolean isFullRow(boolean[] row) {
+        boolean result = true;
+        for (boolean b : row) {
+            result = result && b;
+        }
+        return result;
+    }
+
     private static void removeRow(int rowToRemove,
                                   boolean[][] tiles,
                                   int columns) {
-
         // Shift everything above the removed row down
         for (int y = rowToRemove; y > 0; y--) {
-            for (int x = 0; x < columns; x++) {
-                tiles[y][x] = tiles[y - 1][x];
-            }
+            if (columns >= 0) System.arraycopy(tiles[y - 1], 0, tiles[y], 0, columns);
         }
-
         // Clear the top row
         for (int x = 0; x < columns; x++) {
             tiles[0][x] = false;

@@ -40,14 +40,14 @@ public class TetrisMapTest {
     void clearRows() {
         // Given
         boolean[][] inputRows = new boolean[][] {
-                {true, true,  true },
+                {false, false,  true },
                 {false, false, true },
-                {false, false, true }
+                {true, true, true }
         };
         boolean[][] expectedOutput = new boolean[][] {
-                {false, true, true },
                 {false, false, false},
-                {false, false, false}
+                {false, false, true},
+                {false, false, true}
         };
 
         // When
