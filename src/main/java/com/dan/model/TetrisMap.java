@@ -95,7 +95,7 @@ public class TetrisMap {
             case 3 -> TetrisShape.LONG;
             default -> throw new RuntimeException("Random number out of range");
         };
-        final int column = ThreadLocalRandom.current().nextInt(0, columns - shape.getSize());
+        final int column = ThreadLocalRandom.current().nextInt(0, columns - shape.getSize() + 1);
         final int rotate = ThreadLocalRandom.current().nextInt();
         return new TetrisObject(column, shape, rotate);
     }
