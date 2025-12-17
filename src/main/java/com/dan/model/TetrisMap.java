@@ -23,6 +23,8 @@ public class TetrisMap {
     private final double updateFrequencyNanos;
     private double lastUpdate = 0;
     private final Input input;
+    private double fallDist = 0;
+    private double lastTs = 0;
 
     public TetrisMap(int columns, int rows, Input input, double updateFrequencyNanos) {
         this.columns = columns;
@@ -41,7 +43,11 @@ public class TetrisMap {
         if (ts > lastUpdate + updateFrequencyNanos) {
             lastUpdate = ts;
             update(input.getPressedKeys());
+            fallDist = 0;
         }
+        double delta = ts - lastTs;
+        fallDist += delta / updateFrequencyNanos;
+        lastTs = ts;
     }
 
     private void update(Set<KeyCode> pressedKeys) {
@@ -106,6 +112,32 @@ public class TetrisMap {
 
     public int getColumns() {
         return columns;
+    }
+
+    public List<Tile> getAllTiles() {
+        ArrayList<Tile> tileList = new ArrayList<>(3);
+        for (int y = 0; y < tiles.length; y++) {
+            boolean[] row = tiles[y];
+            boolean fullRow = isFullRow(row);
+            for (int x = 0; x < row.length; x++) {
+                if (row[x]) {
+                    if (fullRow) {
+                        tileList.add(new Tile(x, y, TileState.BREAKING));
+                    } else {
+                        tileList.add(new Tile(x, y, TileState.NORMAL));
+                    }
+                }
+            }
+        }
+        for (Coordinate coordinate : fallingObject.getCoordinates()) {
+            boolean objectCanFall = canObjectMove();
+            tileList.add(new Tile(
+                    coordinate.x(),
+                    objectCanFall ? coordinate.y() + fallDist : coordinate.y(),
+                    coordinate.state()
+            ));
+        }
+        return tileList;
     }
 
     public List<Coordinate> getAllTileCoordinates() {

@@ -2,6 +2,7 @@ package com.dan.view;
 
 import com.dan.model.Coordinate;
 import com.dan.model.TetrisMap;
+import com.dan.model.Tile;
 import com.dan.model.TileState;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -31,15 +32,15 @@ public class TetrisView {
         gc.fillRect(0, 0, w,  h);
 
         // Tiles
-        for (Coordinate coordinate : map.getAllTileCoordinates()) {
-            Color color = switch (coordinate.state()) {
+        for (Tile tile : map.getAllTiles()) {
+            Color color = switch (tile.state()) {
                 case TileState.BREAKING -> Color.RED;
                 case TileState.FALLING -> Color.GREEN;
                 case TileState.NORMAL -> Color.YELLOW;
             };
             gc.setFill(color);
             gc.fillRect(
-                    coordinate.x() * tileWidth, coordinate.y() * tileHeight,
+                    tile.x() * tileWidth, tile.y() * tileHeight,
                     tileWidth, tileHeight
             );
         }
