@@ -7,6 +7,9 @@ import com.dan.model.TileState;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
+import javafx.scene.text.FontWeight;
 
 public class TetrisView {
 
@@ -54,6 +57,17 @@ public class TetrisView {
             gc.setStroke(Color.WHITE);
             gc.strokeLine(c * tileWidth, 0, c * tileWidth, h);
         }
+
+        // Points
+        gc.setFill(Color.RED);
+        gc.setFont(Font.font(
+                "Arial",
+                FontWeight.BOLD,
+                FontPosture.REGULAR,
+                36
+        ));
+        final String pointsMessage = String.format("Score: %s", map.getPoints());
+        gc.fillText(pointsMessage, w / 3, 40);
 
         // Fps
         gc.setFill(Color.YELLOW);

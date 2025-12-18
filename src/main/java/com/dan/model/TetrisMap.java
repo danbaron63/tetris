@@ -25,6 +25,7 @@ public class TetrisMap {
     private final Input input;
     private double fallDist = 0;
     private double lastTs = 0;
+    private int points = 0;
 
     public TetrisMap(int columns, int rows, Input input, double updateFrequencyNanos) {
         this.columns = columns;
@@ -78,7 +79,8 @@ public class TetrisMap {
                 objectAtBottom = true;
             }
         }
-        clearRows(tiles, getColumns(), getRows());
+        final int clearedBlocks = clearRows(tiles, getColumns(), getRows());
+        points += clearedBlocks * 10;
         return GameState.RUNNING;
     }
 
@@ -149,14 +151,17 @@ public class TetrisMap {
         return tileList;
     }
 
-    public static void clearRows(boolean[][] tiles, int columns, int rows) {
+    public static int clearRows(boolean[][] tiles, int columns, int rows) {
+        int clearedBlocks = 0;
         for (int y = 0; y < rows; y++) {
             if (isRowFull(tiles[y])) {
                 // shift all values down 1
                 System.out.printf("Row %s needs removing%n", y);
                 removeRow(y, tiles, columns);
+                clearedBlocks += columns;
             }
         }
+        return clearedBlocks;
     }
 
     private static boolean isRowFull(boolean[] row) {
@@ -187,5 +192,9 @@ public class TetrisMap {
             }
         }
         return true;
+    }
+
+    public int getPoints() {
+        return points;
     }
 }
