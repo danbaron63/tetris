@@ -1,5 +1,6 @@
 package com.dan;
 
+import com.dan.model.GameState;
 import com.dan.model.TetrisMap;
 import com.dan.view.TetrisView;
 import javafx.animation.AnimationTimer;
@@ -43,8 +44,12 @@ public class Main extends Application {
                     info = String.format("FPS: %s", (int) fps);
                     fpsLast = now;
                 }
-                map.update(now);
+                final GameState state = map.update(now);
                 view.render(info);
+
+                if (state == GameState.LOST) {
+                    this.stop();
+                }
 
                 frames += 1;
             }

@@ -39,19 +39,27 @@ public class TetrisMap {
         }
     }
 
-    public void update(double ts) {
+    public GameState update(double ts) {
+        GameState state = GameState.RUNNING;
         if (ts > lastUpdate + updateFrequencyNanos) {
             lastUpdate = ts;
-            update(input.getPressedKeys());
+            state = update(input.getPressedKeys());
             fallDist = 0;
         }
         double delta = ts - lastTs;
         fallDist += delta / updateFrequencyNanos;
         lastTs = ts;
+        return state;
     }
 
-    private void update(Set<KeyCode> pressedKeys) {
+    private GameState update(Set<KeyCode> pressedKeys) {
         if (newObjectRequired()) {
+            // Check if in losing state.
+            boolean[] topRow = tiles[0];
+            if (!isRowEmpty(topRow)) {
+                return GameState.LOST;
+            }
+
             fallingObject = getNewObject();
             // Check if object can be placed as the grid may be full.
         } else {
@@ -71,6 +79,7 @@ public class TetrisMap {
             }
         }
         clearRows(tiles, getColumns(), getRows());
+        return GameState.RUNNING;
     }
 
     private boolean canObjectMove() {
@@ -118,7 +127,7 @@ public class TetrisMap {
         ArrayList<Tile> tileList = new ArrayList<>(3);
         for (int y = 0; y < tiles.length; y++) {
             boolean[] row = tiles[y];
-            boolean fullRow = isFullRow(row);
+            boolean fullRow = isRowFull(row);
             for (int x = 0; x < row.length; x++) {
                 if (row[x]) {
                     if (fullRow) {
@@ -140,32 +149,9 @@ public class TetrisMap {
         return tileList;
     }
 
-    public List<Coordinate> getAllTileCoordinates() {
-        return getAllTileCoordinates(tiles, fallingObject);
-    }
-
-    public static List<Coordinate> getAllTileCoordinates(boolean[][] tiles, TetrisObject fallingObject) {
-        ArrayList<Coordinate> coordinates = new ArrayList<>(3);
-        for (int y = 0; y < tiles.length; y++) {
-            boolean[] row = tiles[y];
-            boolean fullRow = isFullRow(row);
-            for (int x = 0; x < row.length; x++) {
-                if (row[x]) {
-                    if (fullRow) {
-                        coordinates.add(new Coordinate(x, y, TileState.BREAKING));
-                    } else {
-                        coordinates.add(new Coordinate(x, y, TileState.NORMAL));
-                    }
-                }
-            }
-        }
-        coordinates.addAll(fallingObject.getCoordinates());
-        return coordinates;
-    }
-
     public static void clearRows(boolean[][] tiles, int columns, int rows) {
         for (int y = 0; y < rows; y++) {
-            if (isFullRow(tiles[y])) {
+            if (isRowFull(tiles[y])) {
                 // shift all values down 1
                 System.out.printf("Row %s needs removing%n", y);
                 removeRow(y, tiles, columns);
@@ -173,7 +159,7 @@ public class TetrisMap {
         }
     }
 
-    private static boolean isFullRow(boolean[] row) {
+    private static boolean isRowFull(boolean[] row) {
         boolean result = true;
         for (boolean b : row) {
             result = result && b;
@@ -192,5 +178,14 @@ public class TetrisMap {
         for (int x = 0; x < columns; x++) {
             tiles[0][x] = false;
         }
+    }
+
+    private static boolean isRowEmpty(boolean[] row) {
+        for (boolean tile : row) {
+            if (tile) {
+                return false;
+            }
+        }
+        return true;
     }
 }
