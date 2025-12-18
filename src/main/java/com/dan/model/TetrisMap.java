@@ -19,25 +19,20 @@ public class TetrisMap {
     private final int rows;
     private TetrisObject fallingObject;
     private boolean objectAtBottom = true;
-    private final boolean[][] tiles;
     private final double updateFrequencyNanos;
     private double lastUpdate = 0;
     private final Input input;
     private double fallDist = 0;
     private double lastTs = 0;
     private int points = 0;
+    private final Grid grid;
 
     public TetrisMap(int columns, int rows, Input input, double updateFrequencyNanos) {
         this.columns = columns;
         this.rows = rows;
         this.input = input;
         this.updateFrequencyNanos = updateFrequencyNanos;
-        this.tiles = new boolean[rows][columns];
-        for (int x = 0; x < columns; x++) {
-            for (int y = 0; y < rows; y++) {
-                tiles[y][x] = false;
-            }
-        }
+        this.grid = new Grid(columns, rows);
     }
 
     public GameState update(double ts) {
@@ -56,15 +51,14 @@ public class TetrisMap {
     private GameState update(Set<KeyCode> pressedKeys) {
         if (newObjectRequired()) {
             // Check if in losing state.
-            boolean[] topRow = tiles[0];
-            if (!isRowEmpty(topRow)) {
+            if (!grid.isRowEmpty(0)) {
                 return GameState.LOST;
             }
 
             fallingObject = getNewObject();
             // Check if object can be placed as the grid may be full.
         } else {
-            if (canObjectMove()) {
+            if (grid.canObjectMove(fallingObject)) {
                 fallingObject.fallOne();
                 if (pressedKeys.contains(KeyCode.A)) {
                     fallingObject.moveLeft(columns);
@@ -73,28 +67,13 @@ public class TetrisMap {
                     fallingObject.moveRight(columns);
                 }
             } else {
-                for (Coordinate coordinate : fallingObject.getCoordinates()) {
-                    tiles[coordinate.y()][coordinate.x()] = true;
-                }
+                fallingObject.getCoordinates().forEach(grid::setOccupied);
                 objectAtBottom = true;
             }
         }
-        final int clearedBlocks = clearRows(tiles, getColumns(), getRows());
+        final int clearedBlocks = grid.clearRows(getColumns(), getRows());
         points += clearedBlocks * 10;
         return GameState.RUNNING;
-    }
-
-    private boolean canObjectMove() {
-        List<Coordinate> nextCoordinates = fallingObject.getCoordinatesOfNextFall();
-        for (Coordinate coordinate : nextCoordinates) {
-            System.out.printf("Coordinate: x = %s, y = %s%n", coordinate.x(), coordinate.y());
-
-            // if tile occupied or below bottom.
-            if (!(coordinate.y() < rows) || tiles[coordinate.y()][coordinate.x()]) {
-                return false;
-            }
-        }
-        return true;
     }
 
     private boolean newObjectRequired() {
@@ -127,9 +106,9 @@ public class TetrisMap {
 
     public List<Tile> getAllTiles() {
         ArrayList<Tile> tileList = new ArrayList<>(3);
-        for (int y = 0; y < tiles.length; y++) {
-            boolean[] row = tiles[y];
-            boolean fullRow = isRowFull(row);
+        for (int y = 0; y < grid.getHeight(); y++) {
+            boolean[] row = grid.getRow(y);
+            boolean fullRow = grid.isRowFull(y);
             for (int x = 0; x < row.length; x++) {
                 if (row[x]) {
                     if (fullRow) {
@@ -141,7 +120,7 @@ public class TetrisMap {
             }
         }
         for (Coordinate coordinate : fallingObject.getCoordinates()) {
-            boolean objectCanFall = canObjectMove();
+            boolean objectCanFall = grid.canObjectMove(fallingObject);
             tileList.add(new Tile(
                     coordinate.x(),
                     objectCanFall ? coordinate.y() + fallDist : coordinate.y(),
@@ -149,49 +128,6 @@ public class TetrisMap {
             ));
         }
         return tileList;
-    }
-
-    public static int clearRows(boolean[][] tiles, int columns, int rows) {
-        int clearedBlocks = 0;
-        for (int y = 0; y < rows; y++) {
-            if (isRowFull(tiles[y])) {
-                // shift all values down 1
-                System.out.printf("Row %s needs removing%n", y);
-                removeRow(y, tiles, columns);
-                clearedBlocks += columns;
-            }
-        }
-        return clearedBlocks;
-    }
-
-    private static boolean isRowFull(boolean[] row) {
-        boolean result = true;
-        for (boolean b : row) {
-            result = result && b;
-        }
-        return result;
-    }
-
-    private static void removeRow(int rowToRemove,
-                                  boolean[][] tiles,
-                                  int columns) {
-        // Shift everything above the removed row down
-        for (int y = rowToRemove; y > 0; y--) {
-            if (columns >= 0) System.arraycopy(tiles[y - 1], 0, tiles[y], 0, columns);
-        }
-        // Clear the top row
-        for (int x = 0; x < columns; x++) {
-            tiles[0][x] = false;
-        }
-    }
-
-    private static boolean isRowEmpty(boolean[] row) {
-        for (boolean tile : row) {
-            if (tile) {
-                return false;
-            }
-        }
-        return true;
     }
 
     public int getPoints() {
